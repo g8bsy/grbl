@@ -169,7 +169,7 @@ void report_feedback_message(uint8_t message_code)
 // Welcome message
 void report_init_message()
 {
-  printPgmString(PSTR("\r\nGrbl " GRBL_VERSION " ['$' for help]\r\n"));
+  printPgmString(PSTR("\r\nGrbl " GRBL_VERSION "(backlash comp) ['$' for help]\r\n"));
 }
 
 // Grbl help message
@@ -218,6 +218,7 @@ void report_grbl_settings() {
         case 1: report_util_float_setting(val+idx,settings.max_rate[idx],N_DECIMAL_SETTINGVALUE); break;
         case 2: report_util_float_setting(val+idx,settings.acceleration[idx]/(60*60),N_DECIMAL_SETTINGVALUE); break;
         case 3: report_util_float_setting(val+idx,-settings.max_travel[idx],N_DECIMAL_SETTINGVALUE); break;
+        case 4: report_util_float_setting(val+idx,settings.backlash_per_axis[idx],N_DECIMAL_SETTINGVALUE); break;
       }
     }
     val += AXIS_SETTINGS_INCREMENT;
@@ -578,7 +579,7 @@ void report_realtime_status()
             if (bit_istrue(lim_pin_state,bit(Y_AXIS))) { serial_write('Y'); }
           #endif
           #if (DUAL_AXIS_SELECT == Y_AXIS)
-            if (bit_istrue(lim_pin_state,bit(X_AXIS))) { serial_write('X'); }
+            if (bit_istrue(lim_pin_state,bit(X_AXIS))) { serial_write('X'); 
             if (bit_istrue(lim_pin_state,(bit(Y_AXIS)|bit(N_AXIS)))) { serial_write('Y'); }
           #endif
           if (bit_istrue(lim_pin_state,bit(Z_AXIS))) { serial_write('Z'); }
