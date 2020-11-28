@@ -342,6 +342,18 @@ uint8_t plan_buffer_line(float *target, plan_line_data_t *pl_data)
 	memset(position_steps,0,sizeof(position_steps));
 
   // Copy position data based on type of motion being planned.
+	if (block->condition & PL_COND_FLAG_SYSTEM_MOTION)
+	{
+		#ifdef COREXY
+		position_steps[X_AXIS] = system_convert_corexy_to_x_axis_steps(sys_position);
+		position_steps[Y_AXIS] = system_convert_corexy_to_y_axis_steps(sys_position);
+		position_steps[Z_AXIS] = sys_position[Z_AXIS];
+		#else
+
+		memcpy(position_steps, sys_position, sizeof(sys_position));
+		#endif
+  }
+	else
 	{
 		//If compensated motion, assume we are starting from zero.
 		if (!block->back_lash_comp)
@@ -473,6 +485,9 @@ uint8_t plan_buffer_line(float *target, plan_line_data_t *pl_data)
     
     // Update previous path unit_vector and planner position.
     memcpy(pl.previous_unit_vec, unit_vec, sizeof(unit_vec)); // pl.previous_unit_vec[] = unit_vec[]
+
+		//Dont update the planner position for blc. This move should be unknown to the planner.
+		//This should still allow the planner to string the motions together though.
 		if (!(block->back_lash_comp))
     memcpy(pl.position, target_steps, sizeof(target_steps)); // pl.position[] = target_steps[]
 
